@@ -13,11 +13,11 @@ help:
 build:
 	docker-compose build --no-cache
 	docker-compose up -d
-	@echo "Application running at http://localhost:5173"
+	@echo "Application running at http://localhost:3000"
 
 up:
 	docker-compose up -d
-	@echo "Application running at http://localhost:5173"
+	@echo "Application running at http://localhost:3000"
 down:
 	docker-compose down
 
