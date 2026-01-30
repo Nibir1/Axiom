@@ -80,7 +80,7 @@ test-frontend:
 	@echo "Running FRONTEND tests (Vitest)"
 	@echo "---------------------------------------"
 	docker run --rm \
-		-v $(PWD)/frontend:/app \
+		-v "$(CURDIR)/frontend:/app" \
 		-w /app \
-		node:18-alpine \
+		node:22-alpine \
 		/bin/sh -c "npm install && npm test -- --run"

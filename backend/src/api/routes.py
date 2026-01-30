@@ -23,8 +23,15 @@ router = APIRouter()
 scrubber = PIIScrubber()
 scorer = ContentScorer()
 
-# Conditional OpenAI Client (Mockable for tests if key is missing/dummy)
-if settings.OPENAI_API_KEY.startswith("sk-"):
+# Conditional OpenAI Client Initialization
+# We only initialize the client if the key looks real (starts with "sk-") 
+# AND is NOT our known placeholder.
+is_real_key = (
+    settings.OPENAI_API_KEY.startswith("sk-") and 
+    settings.OPENAI_API_KEY != "sk-placeholder-key-for-tests"
+)
+
+if is_real_key:
     openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 else:
     openai_client = None
@@ -35,7 +42,7 @@ class ChatRequest(BaseModel):
     limit: int = 3
 
 # ---------------------------------------------------------
-# 1. Text Ingestion (JSON Payload) - RESTORED
+# 1. Text Ingestion (JSON Payload)
 # ---------------------------------------------------------
 @router.post("/ingest", summary="Ingest and Secure a Document (Text)")
 async def ingest_document(payload: IngestionRequest):
@@ -45,7 +52,7 @@ async def ingest_document(payload: IngestionRequest):
     # 1. Green AI Filter
     quality_score = scorer.calculate_score(payload.text)
     
-    # RAISED Threshold to 0.25 (was 0.1) to correctly reject low-quality test cases
+    # Threshold 0.25 for text tests (stricter 0.4 for PDFs)
     if quality_score < 0.25: 
         raise HTTPException(
             status_code=400, 
@@ -168,7 +175,7 @@ async def chat_with_knowledge(payload: ChatRequest):
     # 3. Call OpenAI (Safety Check)
     if not openai_client:
         return {
-            "answer": "OpenAI API Key is missing. I cannot generate an answer, but here is the context found.",
+            "answer": "System is running in Test Mode (Placeholder API Key detected). I cannot generate an answer, but here is the context found.",
             "context": results
         }
 
