@@ -1,36 +1,42 @@
 """
 config.py
 ---------
-Centralized configuration management for the Axiom engine.
-Uses Pydantic BaseSettings to validate environment variables on startup.
+Centralized configuration management for the Axiom Knowledge Engine.
+Uses Pydantic BaseSettings (v2) to validate environment variables on startup.
 """
 
 from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
     """
     Application configuration settings.
     """
+
+    # --- Core App Settings ---
     PROJECT_NAME: str = "Axiom Knowledge Engine"
     API_V1_STR: str = "/api/v1"
-    
-    # --- ADDED THESE TWO FIELDS ---
-    # They act as placeholders for the values coming from your .env file
-    DEBUG_MODE: bool = False 
-    SECRET_KEY: str = "super-secret-key" 
-    # ------------------------------
 
-    # Vector DB Config
-    QDRANT_HOST: str = "localhost"
+    DEBUG_MODE: bool = False
+    SECRET_KEY: str = "super-secret-key"
+
+    # --- Vector Database (Qdrant) ---
+    # In Docker, this should match the service name
+    QDRANT_HOST: str = "qdrant"
     QDRANT_PORT: int = 6333
     QDRANT_COLLECTION_NAME: str = "upm_knowledge_base"
 
+    # --- LLM / OpenAI Configuration ---
+    # Required: must be provided via .env
+    OPENAI_API_KEY: str
+
     class Config:
-        # Pydantic V2 config to read from .env file
+        # Read environment variables from .env
         env_file = ".env"
         case_sensitive = True
-        # Optional: If you want to allow extra fields in .env without errors, uncomment below:
-        # extra = "ignore" 
+        # Allow extra .env fields without raising errors
+        extra = "ignore"
 
-# Global instance to be imported across the app
+
+# Global settings instance
 settings = Settings()
