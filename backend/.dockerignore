@@ -1,0 +1,22 @@
+# backend/.dockerignore
+
+# Ignore the virtual environment
+.venv
+venv
+ENV
+
+# Ignore cache and compiled files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache
+.coverage
+
+# Ignore git metadata
+.git
+.gitignore
+
+# Ignore local environment variables (optional, but safer)
+.env
